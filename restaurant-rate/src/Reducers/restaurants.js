@@ -1,3 +1,0 @@
-const restaurants =(state=[],action) =>{
-    
-}

@@ -1,0 +1,10 @@
+### Restaurant Fields ###
+-- Name
+-- City
+-- Address 
+-- Phone
+-- Category
+-- Rating
+-- Price Range
+-- Estimated Delivery Time
+### Authentication Fields ###
