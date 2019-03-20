@@ -1,10 +1,17 @@
 import React,{Component} from 'react'
-import {Form, Input,Button,Icon} from 'antd';
+import {Form, Input,Button,Icon,Modal} from 'antd';
 import 'antd/dist/antd.css';
 import { Typography } from 'antd';
+import reqwest from 'reqwest';
 
 const { Title } = Typography;
 
+function info() {
+    Modal.error({
+        title: 'Credentials Error',
+        content: 'Choose other credentials.',
+    });
+  }
 
 class SignUp extends Component{
 
@@ -19,6 +26,21 @@ class SignUp extends Component{
         this.props.form.validateFields((err, values) => {
           if (!err) {
             console.log('Received values of form: ', values);
+            
+            reqwest({
+                url: '/createUser',
+                method: 'post',
+                data:{user:values},
+                success: (res) => {
+                    console.log("New user sent.");
+                    if(res == 'OK'){
+                        this.props.history.push('/login');
+                    }
+                    else{
+                        info()
+                    }
+                },
+              });
           }
         });
     }
