@@ -1,16 +1,42 @@
 import React,{Component} from 'react'
-import { Form, Icon, Input, Button} from 'antd';
+import { Form, Icon, Input, Button,Modal} from 'antd';
 import 'antd/dist/antd.css';
 import { Typography } from 'antd';
+import reqwest from 'reqwest';
 
 const { Title } = Typography;
 
+function info() {
+    Modal.error({
+        title: 'Wrong authentication',
+        content: 'Enter correct credentials to login.',
+    });
+}
 class Login extends Component {
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            console.log('Received values of form: ', values);
+            
+            reqwest({
+                url: '/authenticateUser',
+                method: 'post',
+                data:{user:values},
+                success: (res) => {
+                    console.log("User wanna login.");
+                    console.log(res);
+                    if(res.status == 'OK'){
+
+                        /* Save the token to use it for the authentication */
+                        
+                        /* Redirect to homepage */
+                        this.props.history.push('/');
+                    }
+                    else{
+                        info()
+                    }
+                },
+            });
           }
         });
     }
@@ -21,7 +47,7 @@ class Login extends Component {
                 <Title>Login</Title>
                 <Form onSubmit={this.handleSubmit} className="login-form">
                     <Form.Item>
-                        {getFieldDecorator('userName', {
+                        {getFieldDecorator('username', {
                             rules: [{ required: true, message: 'Please input your username!' }],
                         })(
                             <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />

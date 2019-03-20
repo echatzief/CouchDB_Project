@@ -42,7 +42,6 @@ app.post('/createUser',(req,res)=>{
 
     /* Get the user from the request */
     var user = req.body.user
-    console.log(user)
 
     const mangoQuery = {
         "selector": {
@@ -72,6 +71,70 @@ app.post('/createUser',(req,res)=>{
             /* Inform the frontend that the user exists */
             console.log("[ERROR 1] User already exists");
             res.sendStatus(204);
+        }
+    });
+})
+
+app.post('/authenticateUser',(req,res)=>{
+    /* Get the user from the request */
+    var user = req.body.user
+
+    const mangoQuery = {
+        "selector": {
+            "password":user.password, /* The parameters must be unique */
+            "username":user.username,
+        }
+    };
+
+    const parameters = {};
+
+    /* Check if the user exists */
+    couch.mango("users",mangoQuery,parameters)
+    .then(({data, headers, status})=>{
+
+        /* If the user dont exist dont login */
+        if(data.docs.length == 0){
+            console.log("Failed to authenticate.");
+            res.sendStatus(204);
+        }
+        else{
+            /* login and give new token */
+            console.log("Authentication success.");
+
+            /* Generate the token for authentication */
+            let tok =generateToken({username:user.username,password:user.password});
+        
+            /* Check if the user has been authenticated at the past */
+            couch.mango("authentication",mangoQuery,parameters)
+            .then(({data, headers, status})=>{
+        
+                /* If the user has not been already authenticated at the past */
+                if(data.docs.length == 0){
+
+                    /* Save the token to database */
+                    couch.insert("authentication", {
+                        username:user.username,
+                        password:user.password,
+                        token:tok,
+                    }).then(({data, headers, status}) => {},err => {
+                        console.log("[ERROR 1] : Failed to add a new user to authentication.");
+                    });
+                }
+                else{
+                    var userCred = data.docs[0];
+                    console.log(userCred)
+                    couch.update("authentication", {
+                        _id: userCred._id,
+                        _rev: userCred._rev,
+                        username:userCred.username,
+                        password:userCred.password,
+                        token:tok,
+                    }).then(({data, headers, status}) => {}, err => {
+                        console.log("[ERROR] : Token refresh.");
+                    });
+                }
+            });
+            res.send({status:'OK',token:tok})
         }
     });
 })

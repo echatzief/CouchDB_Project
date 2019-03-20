@@ -11,7 +11,7 @@ function info() {
         title: 'Credentials Error',
         content: 'Choose other credentials.',
     });
-  }
+}
 
 class SignUp extends Component{
 
@@ -25,14 +25,11 @@ class SignUp extends Component{
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
           if (!err) {
-            console.log('Received values of form: ', values);
-            
             reqwest({
                 url: '/createUser',
                 method: 'post',
                 data:{user:values},
                 success: (res) => {
-                    console.log("New user sent.");
                     if(res == 'OK'){
                         this.props.history.push('/login');
                     }
@@ -40,7 +37,7 @@ class SignUp extends Component{
                         info()
                     }
                 },
-              });
+            });
           }
         });
     }
