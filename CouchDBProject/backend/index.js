@@ -15,10 +15,7 @@ const couch = new NodeCouchDb({
 
 //Function that generates token
 var generateToken = require('./utils/generateToken.js').generateToken
-var jwt = require('jsonwebtoken');
 
-//Retrieve the private key
-var privateKey = require('./utils/config.js').key
 
 /* Middlewares */
 var middleWare =require('./utils/middleware.js').authMiddle;
@@ -43,12 +40,13 @@ app.post('/createUser',(req,res)=>{
     /* Get the user from the request */
     var user = req.body.user
 
-    const mangoQuery = {
-        "selector": {
-            "password":user.password, /* The parameters must be unique */
-            "username":user.username,
+    /* Unique email,username */
+    const mangoQuery={
+        "selector":{
+            "$or":[{"password":user.password,"username":user.username,"email":user.email}
+            ,{"username":user.username},{"email":user.email}]
         }
-    };
+    }
     const parameters = {};
 
     /* Check if the user exists */
@@ -140,10 +138,14 @@ app.post('/authenticateUser',(req,res)=>{
 })
 
 /* We use the middleware to every request except sign up */
-app.use(middleWare)
+app.use('/checkToken',middleWare)
 
 /*Get requests */
 app.get('/',(req,res)=>{
+    res.sendFile( path.join( __dirname, '../frontend/build', 'index.html' ));
+})
+/*Get requests */
+app.get('/addRestaurant',(req,res)=>{
     res.sendFile( path.join( __dirname, '../frontend/build', 'index.html' ));
 })
 

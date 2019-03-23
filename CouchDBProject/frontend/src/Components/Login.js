@@ -27,8 +27,9 @@ class Login extends Component {
                     console.log(res);
                     if(res.status == 'OK'){
 
-                        /* Save the token to use it for the authentication */
-                        
+                        /* Save the token to session storage */
+                        sessionStorage.setItem('token',res.token);
+
                         /* Redirect to homepage */
                         this.props.history.push('/');
                     }

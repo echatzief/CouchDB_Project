@@ -1,7 +1,7 @@
 import React,{Component} from 'react'
 import Navbar from '../Components/Navbar'
 import {Form, Input,Slider, Cascader, Button,Select} from 'antd';
-
+import reqwest from 'reqwest';
 const cities =[{
     value:'Volos',
     label:'Volos',
@@ -37,6 +37,31 @@ class AddRestaurant extends Component{
         super(props)
         this.state={
             select:'10',
+        }
+    }
+
+    componentWillMount(){
+
+        /* Authentication checking */
+        if(sessionStorage.getItem('token')!= null){
+            
+            var tok = sessionStorage.getItem('token');
+            console.log(tok)
+            reqwest({
+                url: '/checkToken',
+                method: 'post',
+                data:{token:tok},
+                success: (res) => {
+                    if(res.status === 204){
+                        /* If not authenticated go to login */
+                        this.props.history.push('/login');
+                    }
+                },
+            });
+        }
+        else{
+            /* If not authenticated go to login */
+            this.props.history.push('/login');
         }
     }
     handleSelect = (value)=>{

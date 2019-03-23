@@ -8,3 +8,6 @@
 -- Price Range
 -- Estimated Delivery Time
 ### Authentication Fields ###
+-- Username
+-- Password
+-- Token

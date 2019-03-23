@@ -31,7 +31,7 @@ class SignUp extends Component{
                 data:{user:values},
                 success: (res) => {
                     if(res == 'OK'){
-                        this.props.history.push('/login');
+                       this.props.history.push('/login');
                     }
                     else{
                         info()
