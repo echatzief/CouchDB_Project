@@ -18,7 +18,8 @@ var generateToken = require('./utils/generateToken.js').generateToken
 
 
 /* Middlewares */
-var middleWare =require('./utils/middleware.js').authMiddle;
+var authMiddle =require('./utils/middleware.js').authMiddle;
+var checkToken =require('./utils/middleware.js').checkToken;
 
 
 /* Parsing the body of post requests */
@@ -63,12 +64,12 @@ app.post('/createUser',(req,res)=>{
             }).then(({data, headers, status}) => {},err => {
                 console.log("[ERROR 2] : Failed to create a new user.");
             });
-            res.sendStatus(200);
+            res.send({status:200});
         }
         else{
             /* Inform the frontend that the user exists */
             console.log("[ERROR 1] User already exists");
-            res.sendStatus(204);
+            res.send({status:204});
         }
     });
 })
@@ -93,7 +94,7 @@ app.post('/authenticateUser',(req,res)=>{
         /* If the user dont exist dont login */
         if(data.docs.length == 0){
             console.log("Failed to authenticate.");
-            res.sendStatus(204);
+            res.send({status:204});
         }
         else{
             /* login and give new token */
@@ -132,13 +133,15 @@ app.post('/authenticateUser',(req,res)=>{
                     });
                 }
             });
-            res.send({status:'OK',token:tok})
+            res.send({status:200,token:tok})
         }
     });
 })
 
 /* We use the middleware to every request except sign up */
-app.use('/checkToken',middleWare)
+app.use('/checkToken',checkToken) //For token checking
+app.use('/addNewRestaurant',authMiddle) //To add a restaurant
+app.use('/getRestaurants',authMiddle) //To add a restaurant
 
 /*Get requests */
 app.get('/',(req,res)=>{
@@ -149,10 +152,70 @@ app.get('/addRestaurant',(req,res)=>{
     res.sendFile( path.join( __dirname, '../frontend/build', 'index.html' ));
 })
 
-
 /* Post requests */ 
+app.post('/addNewRestaurant',(req,res)=>{
+    
+    /* Get the restaurant details from the body */
+    var restaurant = req.body.restaurant;
+    console.log(restaurant)
+    const mangoQuery = {
+        "selector": {
+            "restaurantName":restaurant.restaurantName,
+        }
+    };
+
+    const parameters = {};
+    couch.mango("restaurants",mangoQuery,parameters)
+    .then(({data, headers, status})=>{
+        if(data.docs.length === 0){
+
+            /* Save the restaurant to database */
+            couch.insert("restaurants", {
+                restaurantName:restaurant.restaurantName,
+                Address:restaurant.Address,
+                phone:restaurant.phone,
+                priceRange:restaurant.priceRange,
+                city:restaurant.city,
+                category:restaurant.category,
+                estimatedDeliveryTime:restaurant.estimatedDeliveryTime,
+                rating:[],
+            }).then(({data, headers, status}) => {},err => {
+                console.log("[ERROR] : Failed to add a new restaurant.");
+            });
+
+            res.send({status:200});
+            //res.redirect('/addNewRestaurant')
+        }
+        else{
+            console.log("Restaurant already exists!!!");
+            res.send({status:205});
+        }
+    })
+})
 
 
+app.post('/getRestaurants',(req,res)=>{
+
+    //Set some parameters for the query
+    var limit = 1;
+    var numOfPages = req.body.numOfPages;
+
+    const mangoQuery = {
+        "selector":{
+
+        },
+        "limit":limit,
+        "skip": numOfPages*limit,
+    };
+
+    const parameters = {};
+    couch.mango("restaurants",mangoQuery,parameters)
+    .then(({data, headers, status})=>{
+        console.log(data.docs)
+        res.send({status:200,results:data.docs})
+    })
+    
+})
 
 /* Static parts */
 app.use(express.static(path.join(__dirname+'/../frontend/build')));

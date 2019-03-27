@@ -30,7 +30,7 @@ class SignUp extends Component{
                 method: 'post',
                 data:{user:values},
                 success: (res) => {
-                    if(res == 'OK'){
+                    if(res.status == 200){
                        this.props.history.push('/login');
                     }
                     else{

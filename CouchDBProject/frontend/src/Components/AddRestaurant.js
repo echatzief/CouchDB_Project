@@ -36,7 +36,7 @@ class AddRestaurant extends Component{
     constructor(props){
         super(props)
         this.state={
-            select:'10',
+            select:'10 min',
         }
     }
 
@@ -66,15 +66,45 @@ class AddRestaurant extends Component{
     }
     handleSelect = (value)=>{
         this.setState({
-            select:value,
+            select:value.label,
         })
     }
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
+                var restaurant={
+                    restaurantName:values.restaurantName,
+                    Address:values.Address,
+                    phone:values.phone,
+                    priceRange:values.priceRange,
+                    city:values.city[0],
+                    category:values.category[0],
+                    estimatedDeliveryTime:this.state.select,
+                }
                 console.log(this.state.select)
-                console.log('Received values of form: ', values);
+                console.log(restaurant)
+                var tok = sessionStorage.getItem('token');
+                reqwest({
+                    url: '/addNewRestaurant',
+                    method: 'post',
+                    data:{restaurant:restaurant,token:tok},
+                    success: (res) => {
+                        console.log(res)
+                        if(res.status === 200 ){
+                            console.log("Successfully Added.")
+                            window.location.reload();
+                        }
+                        else  if(res.status === 204 ){
+                            console.log("Wrong token")
+                            /* If not authenticated go to login */
+                            this.props.history.push('/login');
+                        }
+                        else{
+                            console.log("Restaurant already exists!!!")
+                        }
+                    },
+                });
             }
         });
     }

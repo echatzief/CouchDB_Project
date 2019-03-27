@@ -1,5 +1,10 @@
-const restaurants =(state={initLoading:true,loading:false,list:[]},action) =>{
+const restaurants =(state={initLoading:true,loading:false,list:[],numOfPages:0},action) =>{
     switch(action.type){
+        case 'INCREASE_PAGE':
+            return{
+                ...state,
+                numOfPages:state.numOfPages + 1,
+            }
         case 'CHANGE_INIT_LOADING':
             return{
                 ...state,

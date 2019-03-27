@@ -8,7 +8,7 @@ class ItemList extends Component{
 
         //Initialize the data before the page loads
         if(this.props.initLoading){
-            this.props.initialLoad();
+            this.props.initialLoad(this.props.numOfPages,this.props.history);
         }
     }
     
@@ -20,7 +20,7 @@ class ItemList extends Component{
               textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px',
             }}
             >
-              <Button onClick={()=>this.props.onLoadMore(list)}>loading more</Button>
+              <Button onClick={()=>this.props.onLoadMore(list,this.props.numOfPages,this.props.history,loading)}>loading more</Button>
             </div>
         ) : null;
 
@@ -33,16 +33,9 @@ class ItemList extends Component{
                 loadMore={loadMore}
                 dataSource={list}
                 renderItem={item => (
-                    <List.Item actions={[<a>edit</a>, <a>more</a>]}>
-                        <Skeleton avatar title={false} loading={item.loading} active>
-                        <List.Item.Meta
-                            avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                            title={<a href="https://ant.design">{item.name.last}</a>}
-                            description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-                        />
-                        <div>content</div>
-                        </Skeleton>
-                  </List.Item>
+                    <List.Item>
+                        <h1>{item.restaurantName}</h1>
+                    </List.Item>
                 )}
             /> 
             </div>   
@@ -56,5 +49,6 @@ ItemList.propTypes={
     list: PropTypes.array.isRequired,
     initialLoad: PropTypes.func.isRequired,
     onLoadMore: PropTypes.func.isRequired,
+    numOfPages:PropTypes.number.isRequired,
 }
 export default ItemList;

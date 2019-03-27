@@ -18,3 +18,8 @@ export const changeRestaurantList = (list)=>({
     type:'CHANGE_RESTAURANT_LIST',
     list:list,
 })
+
+//Increase the page number
+export const increasePageNumber=()=>({
+    type:'INCREASE_PAGE',
+})
