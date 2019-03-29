@@ -25,7 +25,7 @@ class Login extends Component {
                 success: (res) => {
                     console.log("User wanna login.");
                     console.log(res);
-                    if(res.status == 200){
+                    if(res.status === 200){
 
                         /* Save the token to session storage */
                         sessionStorage.setItem('token',res.token);

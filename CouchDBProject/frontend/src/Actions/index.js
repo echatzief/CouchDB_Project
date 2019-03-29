@@ -23,3 +23,29 @@ export const changeRestaurantList = (list)=>({
 export const increasePageNumber=()=>({
     type:'INCREASE_PAGE',
 })
+
+//Change username 
+export const changeUsername = (username)=>({
+    type:'CHANGE_USERNAME',
+    username:username,
+})
+
+//Change Address
+export const changeAddress = (Address)=>({
+    type:'CHANGE_ADDRESS',
+    Address:Address,
+})
+
+//Change email
+export const changeEmail = (email)=>({
+    type:'CHANGE_EMAIL',
+    email:email,
+})
+
+//Change profile
+export const changeProfile = (email,username,Address)=>({
+    type:'CHANGE_PROFILE',
+    email:email,
+    username:username,
+    Address:Address,
+})

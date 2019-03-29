@@ -16,11 +16,10 @@ const couch = new NodeCouchDb({
 //Function that generates token
 var generateToken = require('./utils/generateToken.js').generateToken
 
-
 /* Middlewares */
 var authMiddle =require('./utils/middleware.js').authMiddle;
 var checkToken =require('./utils/middleware.js').checkToken;
-
+var sendBackInfos =require('./utils/middleware.js').sendBackInfos
 
 /* Parsing the body of post requests */
 var bodyParser = require('body-parser')
@@ -142,6 +141,7 @@ app.post('/authenticateUser',(req,res)=>{
 app.use('/checkToken',checkToken) //For token checking
 app.use('/addNewRestaurant',authMiddle) //To add a restaurant
 app.use('/getRestaurants',authMiddle) //To add a restaurant
+app.use('/getPersonalInfoForUser',sendBackInfos) //Retrieve info from user
 
 /*Get requests */
 app.get('/',(req,res)=>{
@@ -151,6 +151,10 @@ app.get('/',(req,res)=>{
 app.get('/addRestaurant',(req,res)=>{
     res.sendFile( path.join( __dirname, '../frontend/build', 'index.html' ));
 })
+app.get('/personalInfo',(req,res)=>{
+    res.sendFile( path.join( __dirname, '../frontend/build', 'index.html' ));
+})
+
 
 /* Post requests */ 
 app.post('/addNewRestaurant',(req,res)=>{
@@ -184,7 +188,6 @@ app.post('/addNewRestaurant',(req,res)=>{
             });
 
             res.send({status:200});
-            //res.redirect('/addNewRestaurant')
         }
         else{
             console.log("Restaurant already exists!!!");

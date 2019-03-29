@@ -32,7 +32,21 @@ var authMiddle=function(req,res,next){
         }
     })
 }
+
+var sendBackInfos = function(req,res,next){
+    //Trying to verify if the token is valid
+    jwt.verify(req.body.token,privateKey,(err,decoded)=>{
+        if(err){
+            return res.send({status:204});
+        }
+        else{
+            console.log(decoded);
+            return res.send({status:200});
+        }
+    })
+}
 module.exports = {
     checkToken:checkToken,
     authMiddle:authMiddle,
+    sendBackInfos:sendBackInfos,
 }

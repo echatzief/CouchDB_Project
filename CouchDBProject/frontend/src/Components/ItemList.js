@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import {List, Avatar, Button, Skeleton,} from 'antd';
+import {List, Button} from 'antd';
 import PropTypes from 'prop-types'
 
 class ItemList extends Component{
@@ -20,7 +20,7 @@ class ItemList extends Component{
               textAlign: 'center', marginTop: 12, height: 32, lineHeight: '32px',
             }}
             >
-              <Button onClick={()=>this.props.onLoadMore(list,this.props.numOfPages,this.props.history,loading)}>loading more</Button>
+              <Button onClick={()=>this.props.onLoadMore(list,this.props.numOfPages,this.props.history)}>loading more</Button>
             </div>
         ) : null;
 

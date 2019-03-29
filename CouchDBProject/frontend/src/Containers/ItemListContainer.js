@@ -38,7 +38,7 @@ function initializeAtStart(dispatch,numOfPages,history){
       });
 }
 
-function loadMoreData(dispatch,old_data,numOfPages,history,loading){
+function loadMoreData(dispatch,old_data,numOfPages,history){
     console.log("Num Of Pages:"+numOfPages);
 
     var tok = sessionStorage.getItem('token');
@@ -79,14 +79,14 @@ function loadMoreData(dispatch,old_data,numOfPages,history,loading){
     });
 }
 const mapStateToProps =(state) => ({
-    initLoading:state.initLoading,
-    loading:state.loading,
-    list:state.list,
-    numOfPages:state.numOfPages,
+    initLoading:state.restaurants.initLoading,
+    loading:state.restaurants.loading,
+    list:state.restaurants.list,
+    numOfPages:state.restaurants.numOfPages,
 })
 const mapDispatchToProps = (dispatch) => ({
     initialLoad: (numOfPages,history)=>initializeAtStart(dispatch,numOfPages,history),
-    onLoadMore:(old_data,numOfPages,history,loading)=>loadMoreData(dispatch,old_data,numOfPages,history,loading),
+    onLoadMore:(old_data,numOfPages,history)=>loadMoreData(dispatch,old_data,numOfPages,history),
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ItemList)
