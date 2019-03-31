@@ -1,5 +1,5 @@
 const profile =(state={email:'',username:'',Address:''},action) =>{
-    switch(action.types){
+    switch(action.type){
         case 'CHANGE_EMAIL':
             return{
                 ...state,
@@ -17,6 +17,7 @@ const profile =(state={email:'',username:'',Address:''},action) =>{
             }
         case 'CHANGE_PROFILE':
             return{
+                ...state,
                 email:action.email,
                 username:action.username,
                 Address:action.Address,

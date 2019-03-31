@@ -1,8 +1,9 @@
 import { connect } from 'react-redux';
 import Profile from '../Components/Profile';
+import {changeProfile} from '../Actions/index';
 import reqwest from 'reqwest';
 
-function initializeProps(dispatch){
+function initProps(dispatch){
 
     var tok = sessionStorage.getItem('token');
     reqwest({
@@ -12,6 +13,9 @@ function initializeProps(dispatch){
         data:{token:tok},
         success: (res) => {
             if(res.status === 200){
+                console.log(res)
+                console.log(changeProfile(res.userDetails.email,res.userDetails.username,res.userDetails.Address))
+                dispatch(changeProfile(res.userDetails.email,res.userDetails.username,res.userDetails.Address))
                 console.log("SUCCESSFULLY.")
             }
             else if(res.status === 204){
@@ -26,7 +30,7 @@ const mapStateToProps =(state) => ({
     Address: state.profile.Address,
 })
 const mapDispatchToProps = (dispatch) => ({
-    initializeProps: ()=>initializeProps(dispatch)
+    initializeProps: ()=>initProps(dispatch)
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Profile)
