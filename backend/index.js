@@ -141,6 +141,7 @@ app.post('/authenticateUser',(req,res)=>{
 app.use('/checkToken',checkToken) //For token checking
 app.use('/addNewRestaurant',authMiddle) //To add a restaurant
 app.use('/getRestaurants',authMiddle) //To add a restaurant
+app.use('/changeField',authMiddle) //To change user infos
 app.use('/getPersonalInfoForUser',sendBackInfos) //Retrieve info from user
 
 /*Get requests */
@@ -217,6 +218,154 @@ app.post('/getRestaurants',(req,res)=>{
         console.log(data.docs)
         res.send({status:200,results:data.docs})
     })
+    
+})
+
+app.post('/changeField',(req,res)=>{
+    
+    /* Retrieve the body parameters */
+    var user = req.body.data;
+    var type = req.body.type;
+
+    if(type === "username"){
+
+        const mangoQuery = {
+            "selector":{
+                "username":user.username,
+            },
+        };
+        
+        /* Change the user details */
+        const parameters = {};
+        couch.mango("users",mangoQuery,parameters)
+        .then(({data, headers, status})=>{
+            console.log(data.docs)
+
+            couch.update("users", {
+                _id: data.docs[0]._id,
+                _rev: data.docs[0]._rev,
+                username:user.inputField,
+                email:data.docs[0].email,
+                password:data.docs[0].password,
+                Address:data.docs[0].Address,
+            }).then(({data, headers, status}) => {
+
+                /* Change the authentication details */
+                couch.mango("authentication",mangoQuery,parameters)
+                .then(({data, headers, status})=>{
+                    console.log(data.docs)
+
+                    let tok =generateToken({username:user.inputField,password:data.docs[0].password});
+                    couch.update("authentication", {
+                        _id: data.docs[0]._id,
+                        _rev: data.docs[0]._rev,
+                        username:user.inputField,
+                        password:data.docs[0].password,
+                        token:tok,
+                    }).then(({data, headers, status}) => {
+                        res.send({status:200,token:tok})
+                    })
+                })
+            })
+        })
+    }
+    else if(type === "password"){
+        
+        const mangoQuery = {
+            "selector":{
+                "username":user.username,
+            },
+        };
+
+        /* Change the user details */
+        const parameters = {};
+        couch.mango("users",mangoQuery,parameters)
+        .then(({data, headers, status})=>{
+            console.log(data.docs)
+
+            couch.update("users", {
+                _id: data.docs[0]._id,
+                _rev: data.docs[0]._rev,
+                username:data.docs[0].username,
+                email:data.docs[0].email,
+                password:user.inputField,
+                Address:data.docs[0].Address,
+            }).then(({data, headers, status}) => {
+
+                /* Change the authentication details */
+                couch.mango("authentication",mangoQuery,parameters)
+                .then(({data, headers, status})=>{
+                    console.log(data.docs)
+        
+                    let tok =generateToken({username:data.docs[0].username,password:user.inputField});
+                    couch.update("authentication", {
+                        _id: data.docs[0]._id,
+                        _rev: data.docs[0]._rev,
+                        username:data.docs[0].username,
+                        password:user.password,
+                        token:tok,
+                    }).then(({data, headers, status}) => {
+                        res.send({status:200,token:tok})
+                    })
+                })
+            })
+        })
+
+
+    }
+    else if(type === "email"){
+
+        /* Change the user details */
+        const mangoQuery = {
+            "selector":{
+                "username":user.username,
+            },
+        };
+    
+        const parameters = {};
+        couch.mango("users",mangoQuery,parameters)
+        .then(({data, headers, status})=>{
+            console.log(data.docs)
+
+            couch.update("users", {
+                _id: data.docs[0]._id,
+                _rev: data.docs[0]._rev,
+                username:data.docs[0].username,
+                email:user.inputField,
+                password:data.docs[0].password,
+                Address:data.docs[0].Address,
+            }).then(({data, headers, status}) => {
+                res.send({status:200})
+            })
+        })
+    }
+    else if(type === "Address"){
+
+        
+        /* Change the user details */
+        const mangoQuery = {
+            "selector":{
+                "username":user.username,
+            },
+        };
+    
+        const parameters = {};
+        couch.mango("users",mangoQuery,parameters)
+        .then(({data, headers, status})=>{
+            console.log(data.docs)
+
+            couch.update("users", {
+                _id: data.docs[0]._id,
+                _rev: data.docs[0]._rev,
+                username:data.docs[0].username,
+                email:data.docs[0].email,
+                password:data.docs[0].password,
+                Address:user.inputField,
+            }).then(({data, headers, status}) => {
+                res.send({status:200})
+            })
+        })
+    }
     
 })
 

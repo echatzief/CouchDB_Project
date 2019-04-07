@@ -13,9 +13,8 @@ class Profile extends Component{
             visibleEditEmail:false,
             visibleEditAddress:false,
             inputField:'',
+            type:'',
         };
-
-        this.handleSumbit = this.handleSumbit.bind(this);
     }
     componentWillMount(){
 
@@ -49,11 +48,13 @@ class Profile extends Component{
     showDrawerUsername = ()=>{
         this.setState({
             visibleEditUsername: true,
+            type:'username'
         });
     }
     closeDrawerUsername = ()=>{
         this.setState({
             visibleEditUsername: false,
+            type:''
         });
     }
 
@@ -61,11 +62,13 @@ class Profile extends Component{
     showDrawerPassword = ()=>{
         this.setState({
             visibleEditPassword: true,
+            type:'password'
         });
     }
     closeDrawerPassword = ()=>{
         this.setState({
             visibleEditPassword: false,
+            type:''
         });
     }
     
@@ -73,11 +76,13 @@ class Profile extends Component{
     showDrawerEmail = ()=>{
         this.setState({
             visibleEditEmail: true,
+            type:'email'
         });
     }
     closeDrawerEmail = ()=>{
         this.setState({
             visibleEditEmail: false,
+            type:''
         });
     }
 
@@ -85,11 +90,13 @@ class Profile extends Component{
     showDrawerAddress = ()=>{
         this.setState({
             visibleEditAddress: true,
+            type:'Address'
         });
     }
     closeDrawerAddress = ()=>{
         this.setState({
             visibleEditAddress: false,
+            type:''
         });
     }
 
@@ -101,13 +108,55 @@ class Profile extends Component{
     }
 
     /* Handle the submittion */
-    handleSumbit(){
-        console.log("State: "+this.state.inputField);
+    handleSumbit = ()=>{
+        console.log("State: "+this.state.inputField,"Item: ",this.state.type);
 
-        //Reset the field
-        this.setState({
-            inputField:'',
-        })
+        if(this.state.inputField !== ""){
+
+            var tok = sessionStorage.getItem('token');
+            var input = this.state.inputField;
+
+            var dat = {
+                username:this.props.username,
+                inputField:input,
+            }
+            reqwest({
+                url: '/changeField',
+                method: 'post',
+                data:{type:this.state.type,data:dat,token:tok},
+                success: (res) => {
+
+                    if(res.status === 200){
+                        
+                        /* Save the new token to session storage */
+                        if(this.state.type === "username" || this.state.type === "password"){
+                            sessionStorage.setItem('token',res.token);
+                            console.log("SWAPED THE TOKEN.")
+                        }
+
+                        /* Change the info at personal info */
+                        if(this.state.type === "username"){
+                            this.props.changeFields(input,this.state.email,this.state.Address)
+                        }
+                        else if(this.state.type === "email"){
+                            this.props.changeFields(this.state.username,input,this.state.Address)
+                        }
+                        else if(this.state.type === "Address"){
+                            this.props.changeFields(this.state.username,this.state.email,input)
+                        }
+                    }
+                    else if(res.status === 204){
+                        /* If not authenticated go to login */
+                        this.props.history.push('/login');
+                    }
+                },
+            });
+
+            //Reset the field
+            this.setState({
+                inputField:'',
+            })
+        }
     }
     render(){
         return(
@@ -236,6 +285,7 @@ Profile.propTypes={
     email: PropTypes.string.isRequired,
     Address: PropTypes.string.isRequired,
     initializeProps:PropTypes.func.isRequired,
+    changeFields:PropTypes.func.isRequired,
 }
 
 export default Profile;

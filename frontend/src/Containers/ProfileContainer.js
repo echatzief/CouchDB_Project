@@ -24,13 +24,17 @@ function initProps(dispatch){
         }
     });
 }
+function changeFields(dispatch,username,email,Address){
+    dispatch(changeProfile(email,username,Address));
+}
 const mapStateToProps =(state) => ({
     username: state.profile.username,
     email: state.profile.email,
     Address: state.profile.Address,
 })
 const mapDispatchToProps = (dispatch) => ({
-    initializeProps: ()=>initProps(dispatch)
+    initializeProps: ()=>initProps(dispatch),
+    changeFields: (username,email,Address)=>changeFields(dispatch,username,email,Address)
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(Profile)
