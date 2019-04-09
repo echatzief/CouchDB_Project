@@ -142,6 +142,7 @@ app.use('/checkToken',checkToken) //For token checking
 app.use('/addNewRestaurant',authMiddle) //To add a restaurant
 app.use('/getRestaurants',authMiddle) //To add a restaurant
 app.use('/changeField',authMiddle) //To change user infos
+app.use('/rateRestaurant',authMiddle) //Rate a restaurant
 app.use('/getPersonalInfoForUser',sendBackInfos) //Retrieve info from user
 
 /*Get requests */
@@ -369,6 +370,63 @@ app.post('/changeField',(req,res)=>{
     
 })
 
+app.post('/rateRestaurant',(req,res)=>{
+    /* Retrieve parameters */
+    var rate = req.body.rate
+    var username = req.body.username
+    var restaurantName = req.body.restaurantName
+
+    /* Change the restaurantRating*/
+    const mangoQuery = {
+        "selector":{
+            "restaurantName":restaurantName,
+        },
+    };
+
+    const parameters = {};
+    couch.mango("restaurants",mangoQuery,parameters)
+    .then(({data, headers, status})=>{
+
+        /* Retrieve restaurant details */
+        var rates = data.docs[0].rating
+
+        var inside = false
+        for(let i = 0;i<rates.length;i++){
+
+            /* Check if the user has already rate it */
+            if(rates[i].username === username){
+                rates[i].rate=rate
+                inside = true
+            }
+        }
+
+        /* If changed */
+        if(inside === true){
+            console.log(rates)
+        }
+        else{
+            rates.push({username:username,rate:rate})
+        }
+
+        /* Update the restaurant */
+        couch.update("restaurants", {
+            _id: data.docs[0]._id,
+            _rev: data.docs[0]._rev,
+            restaurantName:data.docs[0].restaurantName,
+            Address:data.docs[0].Address,
+            phone:data.docs[0].phone,
+            priceRange:data.docs[0].priceRange,
+            city:data.docs[0].city,
+            category:data.docs[0].category,
+            estimatedDeliveryTime:data.docs[0].estimatedDeliveryTime,
+            rating:rates,
+        }).then(({data, headers, status}) => {
+            res.send({status:200})
+        })
+    })
+
+    console.log(rate,username,restaurantName)
+})
 /* Static parts */
 app.use(express.static(path.join(__dirname+'/../frontend/build')));
 

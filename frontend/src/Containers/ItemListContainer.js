@@ -5,7 +5,29 @@ import {changeRestaurantList} from '../Actions/index';
 import {changeInitLoading} from '../Actions/index';
 import {increasePageNumber} from '../Actions/index'
 import {changeLoading} from '../Actions/index';
+import {changeProfile} from '../Actions/index';
 
+function initProps(dispatch){
+
+    var tok = sessionStorage.getItem('token');
+    reqwest({
+        url: '/getPersonalInfoForUser',
+        type: 'json',
+        method: 'post',
+        data:{token:tok},
+        success: (res) => {
+            if(res.status === 200){
+                console.log(res)
+                console.log(changeProfile(res.userDetails.email,res.userDetails.username,res.userDetails.Address))
+                dispatch(changeProfile(res.userDetails.email,res.userDetails.username,res.userDetails.Address))
+                console.log("SUCCESSFULLY.")
+            }
+            else if(res.status === 204){
+                console.log("TOKEN IS NOT VALID.")
+            }
+        }
+    });
+}
 
 function initializeAtStart(dispatch,numOfPages,history){
 
@@ -35,7 +57,7 @@ function initializeAtStart(dispatch,numOfPages,history){
                 history.push('/login');
             }
         },
-      });
+    });
 }
 
 function loadMoreData(dispatch,old_data,numOfPages,history){
@@ -83,10 +105,14 @@ const mapStateToProps =(state) => ({
     loading:state.restaurants.loading,
     list:state.restaurants.list,
     numOfPages:state.restaurants.numOfPages,
+    username: state.profile.username,
+    email: state.profile.email,
+    Address: state.profile.Address,
 })
 const mapDispatchToProps = (dispatch) => ({
     initialLoad: (numOfPages,history)=>initializeAtStart(dispatch,numOfPages,history),
     onLoadMore:(old_data,numOfPages,history)=>loadMoreData(dispatch,old_data,numOfPages,history),
+    initializeProps: ()=>initProps(dispatch),
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ItemList)
