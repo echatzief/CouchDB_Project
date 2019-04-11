@@ -1,7 +1,9 @@
 import React,{Component} from 'react'
 import Navbar from '../Components/Navbar'
-import {Form, Input,Slider, Cascader, Button,Select} from 'antd';
+import {Form, Input,Slider, Cascader, Button,Select,Modal} from 'antd';
 import reqwest from 'reqwest';
+
+/* Cities for adding a restaurant */
 const cities =[{
     value:'Volos',
     label:'Volos',
@@ -19,6 +21,7 @@ const cities =[{
     label:'Giannena',
 },]
 
+/* Categories of restaurants */
 const categories =[{
     value:'Chinese',
     label:'Chinese',
@@ -32,6 +35,16 @@ const categories =[{
     value:'Pizza',
     label:'Pizza',
 },]
+
+
+/* When restaurant exists */
+function errorRestaurant() {
+    Modal.error({
+        title: 'Restaurant exists',
+        content: 'Enter another restaurant name.',
+    });
+}
+
 class AddRestaurant extends Component{
     constructor(props){
         super(props)
@@ -46,7 +59,6 @@ class AddRestaurant extends Component{
         if(sessionStorage.getItem('token')!= null){
             
             var tok = sessionStorage.getItem('token');
-            console.log(tok)
             reqwest({
                 url: '/checkToken',
                 method: 'post',
@@ -64,11 +76,15 @@ class AddRestaurant extends Component{
             this.props.history.push('/login');
         }
     }
+
+    /* Change the select state */
     handleSelect = (value)=>{
         this.setState({
             select:value.label,
         })
     }
+
+    /* Add a new restaurant to database */
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFieldsAndScroll((err, values) => {
@@ -82,26 +98,24 @@ class AddRestaurant extends Component{
                     category:values.category[0],
                     estimatedDeliveryTime:this.state.select,
                 }
-                console.log(this.state.select)
-                console.log(restaurant)
+
+                /* Get the token to use it to the request */
                 var tok = sessionStorage.getItem('token');
                 reqwest({
                     url: '/addNewRestaurant',
                     method: 'post',
                     data:{restaurant:restaurant,token:tok},
                     success: (res) => {
-                        console.log(res)
+
                         if(res.status === 200 ){
-                            console.log("Successfully Added.")
                             window.location.reload();
                         }
                         else  if(res.status === 204 ){
-                            console.log("Wrong token")
                             /* If not authenticated go to login */
                             this.props.history.push('/login');
                         }
                         else{
-                            console.log("Restaurant already exists!!!")
+                            errorRestaurant()
                         }
                     },
                 });

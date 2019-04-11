@@ -1,4 +1,4 @@
-//Retrieve the private key
+/* Retrieve the private key */
 var privateKey = require('./config.js').key
 var jwt = require('jsonwebtoken');
 
@@ -11,47 +11,49 @@ const couch = new NodeCouchDb({
     }
 });
 
-//Authentication middleware function
+/* Authentication middleware function */
+/* Only token check */
 var checkToken=function(req,res,next){
 
-    console.log("INSIDE AUTH")
-    //Trying to verify if the token is valid
+    /* Trying to verify if the token is valid */
     jwt.verify(req.body.token,privateKey,(err,decoded)=>{
         if(err){
-            console.log("Token is not valid");
+            console.log("[checkToken]: Token is not valid");
             return res.send({status:204});
         }
         else{
-            console.log("Token is valid");
+            console.log("[checkToken]: Token is valid");
             return res.send({status:200});
         }
     })
 }
+
+/* Check the token first and then processed to request */
 var authMiddle=function(req,res,next){
 
-    //Trying to verify if the token is valid
+    /* Trying to verify if the token is valid */
     jwt.verify(req.body.token,privateKey,(err,decoded)=>{
         if(err){
-            console.log("Token is not valid");
+            console.log("[authMiddle]: Token is not valid");
             return res.send({status:204});
         }
         else{
-            console.log("Token is valid");
+            console.log("[authMiddle]: Token is valid");
             next()
         }
     })
 }
 
+/* Retrieve from jwt the credentials of the user */
 var sendBackInfos = function(req,res,next){
-    //Trying to verify if the token is valid
+
+    /* Trying to verify if the token is valid */
     jwt.verify(req.body.token,privateKey,(err,decoded)=>{
         if(err){
             return res.send({status:204});
         }
         else{
-            console.log(decoded);
 
-            /* Search for the user */
             const mangoQuery = {
                 "selector": {
                     "password":decoded.password, /* The parameters must be unique */
@@ -60,15 +62,14 @@ var sendBackInfos = function(req,res,next){
             };
 
             const parameters = {};
-
+            /* Search for the user */
             couch.mango("users",mangoQuery,parameters)
             .then(({data, headers, status})=>{
                 if(data.docs.length === 0){
                     return res.send({status:204});
                 }
                 else{
-                    console.log(data.docs[0])
-
+                    /* Send back the info */
                     var userDetails={
                         "username":data.docs[0].username,
                         "email":data.docs[0].email,

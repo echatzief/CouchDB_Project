@@ -13,7 +13,7 @@ import AddRestaurant from './Components/AddRestaurant'
 import ProfileContainer from './Containers/ProfileContainer';
 
 //Create store
-export const store = createStore(allReducers);
+const store = createStore(allReducers);
 
 const render = () => ReactDOM.render(
     <Provider store={store}>

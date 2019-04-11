@@ -13,6 +13,8 @@ function info() {
     });
 }
 class Login extends Component {
+
+    /* Authenticate and login */
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
@@ -23,8 +25,6 @@ class Login extends Component {
                 method: 'post',
                 data:{user:values},
                 success: (res) => {
-                    console.log("User wanna login.");
-                    console.log(res);
                     if(res.status === 200){
 
                         /* Save the token to session storage */

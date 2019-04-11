@@ -21,6 +21,8 @@ class SignUp extends Component{
             confirmDirty: false,
         }
     }
+
+    /* Create a new user */
     handleSubmit = (e) => {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
@@ -41,6 +43,8 @@ class SignUp extends Component{
           }
         });
     }
+
+    /* Compare the password with the confirmation */
     compareToFirstPassword = (rule, value, callback) => {
         const form = this.props.form;
         if (value && value !== form.getFieldValue('password')) {

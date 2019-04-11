@@ -7,7 +7,7 @@ import {increasePageNumber} from '../Actions/index'
 import {changeLoading} from '../Actions/index';
 import {changeProfile} from '../Actions/index';
 
-function initProps(dispatch){
+function initProps(dispatch,history){
 
     var tok = sessionStorage.getItem('token');
     reqwest({
@@ -17,13 +17,10 @@ function initProps(dispatch){
         data:{token:tok},
         success: (res) => {
             if(res.status === 200){
-                console.log(res)
-                console.log(changeProfile(res.userDetails.email,res.userDetails.username,res.userDetails.Address))
                 dispatch(changeProfile(res.userDetails.email,res.userDetails.username,res.userDetails.Address))
-                console.log("SUCCESSFULLY.")
             }
             else if(res.status === 204){
-                console.log("TOKEN IS NOT VALID.")
+                history.push('/login');
             }
         }
     });
@@ -31,9 +28,7 @@ function initProps(dispatch){
 
 function initializeAtStart(dispatch,numOfPages,history){
 
-    console.log("Num Of Pages:"+numOfPages);
     var tok = sessionStorage.getItem('token');
-    console.log(tok)
     reqwest({
         url: '/getRestaurants',
         type: 'json',
@@ -42,7 +37,6 @@ function initializeAtStart(dispatch,numOfPages,history){
         success: (res) => {
 
             if(res.status === 200){
-                console.log(res)
             
                 //Change initLoading to false
                 dispatch(changeInitLoading())
@@ -61,10 +55,8 @@ function initializeAtStart(dispatch,numOfPages,history){
 }
 
 function loadMoreData(dispatch,old_data,numOfPages,history){
-    console.log("Num Of Pages:"+numOfPages);
 
     var tok = sessionStorage.getItem('token');
-    console.log(tok)
     reqwest({
         url: '/getRestaurants',
         type: 'json',
@@ -78,7 +70,6 @@ function loadMoreData(dispatch,old_data,numOfPages,history){
                 //If no result then remove the button
                 if(res.results.length===0){
 
-                    console.log("LOADING FALSE");
                     //Change loading to false
                     dispatch(changeLoading())
                 }
@@ -112,7 +103,7 @@ const mapStateToProps =(state) => ({
 const mapDispatchToProps = (dispatch) => ({
     initialLoad: (numOfPages,history)=>initializeAtStart(dispatch,numOfPages,history),
     onLoadMore:(old_data,numOfPages,history)=>loadMoreData(dispatch,old_data,numOfPages,history),
-    initializeProps: ()=>initProps(dispatch),
+    initializeProps: (history)=>initProps(dispatch,history),
 })
 
 export default connect(mapStateToProps,mapDispatchToProps)(ItemList)

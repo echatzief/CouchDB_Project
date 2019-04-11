@@ -1,18 +1,9 @@
 import React,{Component} from 'react'
 import Navbar from './Navbar'
-import {store} from '../index'
-import {changeInitLoading} from '../Actions/index'
 import ItemListContainer from '../Containers/ItemListContainer';
 import reqwest from 'reqwest';
 
 class App extends Component{
-
-    func = ()=>{
-        console.log(store.getState())
-    }
-    change = ()=>{
-        store.dispatch(changeInitLoading())
-    }
 
     componentWillMount(){
 
@@ -20,7 +11,6 @@ class App extends Component{
         if(sessionStorage.getItem('token')!= null){
             
             var tok = sessionStorage.getItem('token');
-            console.log(tok)
             reqwest({
                 url: '/checkToken',
                 method: 'post',
@@ -43,8 +33,6 @@ class App extends Component{
             <div>
                 <Navbar/>
                 <ItemListContainer/>
-                <button onClick={this.func}>Store</button>
-                <button onClick={this.change}>Change</button>
             </div>
         )
     }

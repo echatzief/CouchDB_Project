@@ -13,7 +13,7 @@ const couch = new NodeCouchDb({
     }
 });
 
-//Function that generates token
+/* Function that generates token */
 var generateToken = require('./utils/generateToken.js').generateToken
 
 /* Middlewares */
@@ -96,9 +96,8 @@ app.post('/authenticateUser',(req,res)=>{
             res.send({status:204});
         }
         else{
-            /* login and give new token */
-            console.log("Authentication success.");
 
+            /* Login and give new token */
             /* Generate the token for authentication */
             let tok =generateToken({username:user.username,password:user.password});
         
@@ -119,8 +118,9 @@ app.post('/authenticateUser',(req,res)=>{
                     });
                 }
                 else{
+                    
+                    /* Save the generated credentials to database */
                     var userCred = data.docs[0];
-                    console.log(userCred)
                     couch.update("authentication", {
                         _id: userCred._id,
                         _rev: userCred._rev,
@@ -158,11 +158,14 @@ app.get('/personalInfo',(req,res)=>{
 })
 
 
-/* Post requests */ 
+/* Post requests  that are protected with middleware and requires token */ 
+
+/* Add a new restaurant to the database */
 app.post('/addNewRestaurant',(req,res)=>{
     
     /* Get the restaurant details from the body */
     var restaurant = req.body.restaurant;
+    console.log("Wanna add new Restaurant: ")
     console.log(restaurant)
     const mangoQuery = {
         "selector": {
@@ -198,30 +201,33 @@ app.post('/addNewRestaurant',(req,res)=>{
     })
 })
 
-
+/* 
+    Fetch to frontend the restaurant that are included inside 
+    our database
+*/
 app.post('/getRestaurants',(req,res)=>{
 
-    //Set some parameters for the query
+    /* Set some parameters for the query */
     var limit = 1;
     var numOfPages = req.body.numOfPages;
 
     const mangoQuery = {
         "selector":{
-
         },
         "limit":limit,
         "skip": numOfPages*limit,
     };
 
+    /* Return specific number of restaurant to frontend */
     const parameters = {};
     couch.mango("restaurants",mangoQuery,parameters)
     .then(({data, headers, status})=>{
-        console.log(data.docs)
         res.send({status:200,results:data.docs})
     })
     
 })
 
+/* Edit some profile details */
 app.post('/changeField',(req,res)=>{
     
     /* Retrieve the body parameters */
@@ -240,8 +246,7 @@ app.post('/changeField',(req,res)=>{
         const parameters = {};
         couch.mango("users",mangoQuery,parameters)
         .then(({data, headers, status})=>{
-            console.log(data.docs)
-
+            
             couch.update("users", {
                 _id: data.docs[0]._id,
                 _rev: data.docs[0]._rev,
@@ -254,7 +259,6 @@ app.post('/changeField',(req,res)=>{
                 /* Change the authentication details */
                 couch.mango("authentication",mangoQuery,parameters)
                 .then(({data, headers, status})=>{
-                    console.log(data.docs)
 
                     let tok =generateToken({username:user.inputField,password:data.docs[0].password});
                     couch.update("authentication", {
@@ -264,9 +268,43 @@ app.post('/changeField',(req,res)=>{
                         password:data.docs[0].password,
                         token:tok,
                     }).then(({data, headers, status}) => {
-                        res.send({status:200,token:tok})
+
+                        /* Change the rating details */
+                        const mangoQuery = {
+                            "selector":{
+                            },
+                        };
+                        couch.mango("restaurants",mangoQuery,parameters)
+                        .then(({data, headers, status})=>{
+
+                            for(let i = 0 ;i<data.docs.length;i++){
+                                var rating = data.docs[i].rating;
+
+                                /* Update the rating after name change */
+                                for(let j = 0; j<rating.length;j++){
+                                    if(rating[i].username === user.username){
+                                        rating[i].username = user.inputField;
+                                        couch.update("restaurants", {
+                                            _id: data.docs[i]._id,
+                                            _rev: data.docs[i]._rev,
+                                            restaurantName:data.docs[i].restaurantName,
+                                            Address:data.docs[i].Address,
+                                            phone:data.docs[i].phone,
+                                            priceRange:data.docs[i].priceRange,
+                                            city:data.docs[i].city,
+                                            category:data.docs[i].category,
+                                            estimatedDeliveryTime:data.docs[i].estimatedDeliveryTime,
+                                            rating:rating,
+                                        }).then(({data, headers, status}) => {
+                                            console.log("Username changed.");
+                                            res.send({status:200,token:tok})
+                                        })
+                                    }
+                                }
+                            }
+                        })
                     })
-                })
+                })   
             })
         })
     }
@@ -282,7 +320,6 @@ app.post('/changeField',(req,res)=>{
         const parameters = {};
         couch.mango("users",mangoQuery,parameters)
         .then(({data, headers, status})=>{
-            console.log(data.docs)
 
             couch.update("users", {
                 _id: data.docs[0]._id,
@@ -306,13 +343,12 @@ app.post('/changeField',(req,res)=>{
                         password:user.password,
                         token:tok,
                     }).then(({data, headers, status}) => {
+                        console.log("Password changed.")
                         res.send({status:200,token:tok})
                     })
                 })
             })
         })
-
-
     }
     else if(type === "email"){
 
@@ -326,7 +362,6 @@ app.post('/changeField',(req,res)=>{
         const parameters = {};
         couch.mango("users",mangoQuery,parameters)
         .then(({data, headers, status})=>{
-            console.log(data.docs)
 
             couch.update("users", {
                 _id: data.docs[0]._id,
@@ -336,6 +371,7 @@ app.post('/changeField',(req,res)=>{
                 password:data.docs[0].password,
                 Address:data.docs[0].Address,
             }).then(({data, headers, status}) => {
+                console.log("E-mail changed.");
                 res.send({status:200})
             })
         })
@@ -353,7 +389,6 @@ app.post('/changeField',(req,res)=>{
         const parameters = {};
         couch.mango("users",mangoQuery,parameters)
         .then(({data, headers, status})=>{
-            console.log(data.docs)
 
             couch.update("users", {
                 _id: data.docs[0]._id,
@@ -363,6 +398,7 @@ app.post('/changeField',(req,res)=>{
                 password:data.docs[0].password,
                 Address:user.inputField,
             }).then(({data, headers, status}) => {
+                console.log("Address changed.")
                 res.send({status:200})
             })
         })
@@ -370,6 +406,8 @@ app.post('/changeField',(req,res)=>{
     
 })
 
+
+/* Rate a restaurant of the existing ones */
 app.post('/rateRestaurant',(req,res)=>{
     /* Retrieve parameters */
     var rate = req.body.rate
@@ -402,9 +440,10 @@ app.post('/rateRestaurant',(req,res)=>{
 
         /* If changed */
         if(inside === true){
-            console.log(rates)
+            console.log("Rate altered.");
         }
         else{
+            console.log("Rate inserted.");
             rates.push({username:username,rate:rate})
         }
 
@@ -421,11 +460,10 @@ app.post('/rateRestaurant',(req,res)=>{
             estimatedDeliveryTime:data.docs[0].estimatedDeliveryTime,
             rating:rates,
         }).then(({data, headers, status}) => {
+            console.log("Rate of restaurant updated.");
             res.send({status:200})
         })
     })
-
-    console.log(rate,username,restaurantName)
 })
 /* Static parts */
 app.use(express.static(path.join(__dirname+'/../frontend/build')));

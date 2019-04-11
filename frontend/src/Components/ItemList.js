@@ -23,13 +23,13 @@ class ItemList extends Component{
     }
     componentWillMount(){
 
-        //Initialize the data before the page loads
+        /* Initialize the data before the page loads */
         if(this.props.initLoading){
             this.props.initialLoad(this.props.numOfPages,this.props.history);
         }
 
-        //Initialize the profile details
-        this.props.initializeProps()
+        /* Initialize the profile details */
+        this.props.initializeProps(this.props.history)
     }
 
     /* Change the rating and send the request */
@@ -39,8 +39,6 @@ class ItemList extends Component{
         this.setState({
             rateVal:val,
         },()=>{
-            console.log("Rating: "+this.state.rateVal+" Restaurant: "+rest)
-            console.log(this.props.username)
 
             reqwest({
                 url: '/rateRestaurant',
@@ -49,8 +47,7 @@ class ItemList extends Component{
                 success: (res) => {
         
                     if(res.status === 200){
-                        console.log("Rated!")
-        
+                        window.location.reload();
                     }
                 },
             });

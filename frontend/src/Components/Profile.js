@@ -22,7 +22,6 @@ class Profile extends Component{
         if(sessionStorage.getItem('token')!= null){
             
             var tok = sessionStorage.getItem('token');
-            console.log(tok)
             reqwest({
                 url: '/checkToken',
                 method: 'post',
@@ -41,7 +40,7 @@ class Profile extends Component{
         }
 
         //Initialize the fields 
-        this.props.initializeProps();
+        this.props.initializeProps(this.props.history);
     }
 
     /* Username */
@@ -109,7 +108,6 @@ class Profile extends Component{
 
     /* Handle the submittion */
     handleSumbit = ()=>{
-        console.log("State: "+this.state.inputField,"Item: ",this.state.type);
 
         if(this.state.inputField !== ""){
 
@@ -131,7 +129,6 @@ class Profile extends Component{
                         /* Save the new token to session storage */
                         if(this.state.type === "username" || this.state.type === "password"){
                             sessionStorage.setItem('token',res.token);
-                            console.log("SWAPED THE TOKEN.")
                         }
 
                         /* Change the info at personal info */
@@ -144,6 +141,7 @@ class Profile extends Component{
                         else if(this.state.type === "Address"){
                             this.props.changeFields(this.state.username,this.state.email,input)
                         }
+                        window.location.reload();
                     }
                     else if(res.status === 204){
                         /* If not authenticated go to login */
