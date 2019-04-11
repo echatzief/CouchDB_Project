@@ -1,0 +1,51 @@
+{
+    "users":[{
+        "username": "left",
+        "email": "left@gmail.com",
+        "password": "1234",
+        "Address": "Pilliou 27"
+    },{
+        "username": "test",
+        "email": "test@gmail.com",
+        "password": "1234",
+        "Address": "Gklavanh 12"
+    },{
+        "username": "rolf",
+        "email": "rolf.hegdal@example.com",
+        "password": "1234",
+        "Address": "ljan terrasse 346"
+    },{
+        "username": "Frored",
+        "email": "JanetDLopez@dayrep.com",
+        "password": "Aighie8oo",
+        "Address": "ljan terrasse 356"
+    }],
+    "restaurants":[{
+        "restaurantName": "Coffee Island",
+        "Address": "Αναλήψεως 114",
+        "phone": "2421312027",
+        "priceRange": "5",
+        "city": "Volos",
+        "category": "Coffee",
+        "estimatedDeliveryTime": "10 min",
+        "rating": []
+    },{
+        "restaurantName": "YORK 77",
+        "Address": "Αγγελόπουλου 3",
+        "phone": "2109233999",
+        "priceRange": "15",
+        "city": "Athens",
+        "category": "Pizza",
+        "estimatedDeliveryTime": "15 min",
+        "rating": []
+    },{
+        "restaurantName": "Noodle's Volos",
+        "Address": "Ιάσονος 104 & Γκλαβάνη",
+        "phone": "2421020021",
+        "priceRange": "10",
+        "city": "Volos",
+        "category": "Chinese",
+        "estimatedDeliveryTime": "30 min",
+        "rating": []
+    }]
+}
