@@ -118,6 +118,7 @@ class Profile extends Component{
                 username:this.props.username,
                 inputField:input,
             }
+            console.log(dat)
             reqwest({
                 url: '/changeField',
                 method: 'post',

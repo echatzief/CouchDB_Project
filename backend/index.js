@@ -282,8 +282,8 @@ app.post('/changeField',(req,res)=>{
 
                                 /* Update the rating after name change */
                                 for(let j = 0; j<rating.length;j++){
-                                    if(rating[i].username === user.username){
-                                        rating[i].username = user.inputField;
+                                    if(rating[j].username === user.username){
+                                        rating[j].username = user.inputField;
                                         couch.update("restaurants", {
                                             _id: data.docs[i]._id,
                                             _rev: data.docs[i]._rev,
@@ -296,12 +296,13 @@ app.post('/changeField',(req,res)=>{
                                             estimatedDeliveryTime:data.docs[i].estimatedDeliveryTime,
                                             rating:rating,
                                         }).then(({data, headers, status}) => {
-                                            console.log("Username changed.");
-                                            res.send({status:200,token:tok})
+                                    
                                         })
                                     }
                                 }
                             }
+                            console.log("Username changed.");
+                            res.send({status:200,token:tok})
                         })
                     })
                 })   
