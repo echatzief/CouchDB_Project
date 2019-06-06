@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "antd": "^3.14.1",
-    "react": "^16.8.4",
-    "react-dom": "^16.8.4",
-    "react-redux": "^6.0.1",
-    "react-router-dom": "^4.3.1",
-    "react-scripts": "2.1.8",
-    "redux": "^4.0.1",
-    "reqwest": "^2.0.5"
+    "antd": "*",
+    "react": "*",
+    "react-dom": "*",
+    "react-redux": "*",
+    "react-router-dom": "*",
+    "react-scripts": "*",
+    "redux": "*",
+    "reqwest": "*"
   },
   "scripts": {
     "start": "react-scripts start",
